@@ -20,15 +20,15 @@ Each row in the file will have the following information, separated by commas:
 - current account balance
 
 #### Sample data:
-14707080701234567890139, 12345, AnnaB, tWp54@, 20/10/1995, 2500, 500.6, 7890.25
-14707080701234567890156, 12345, Kate78, Zpt#$5, 10/05/1978, 4000, 0, 45233.99
+- 14707080701234567890139, 12345, AnnaB, tWp54@, 20/10/1995, 2500, 500.6, 7890.25
+- 14707080701234567890156, 12345, Kate78, Zpt#$5, 10/05/1978, 4000, 0, 45233.99
 
 Additionally, a file for banking advisors needs to be included. Each advisor will have an advisorID, username, password, and a list of customers identified by their RIB.
 
 ### Sample Advisor Data Format
-12345, advisor1, pass1, 14707080701234567890139
-12345, advisor1, pass1, 14707080701234567890156
-20003, advisor2, pass2, 14707080701234567890300
+- 12345, advisor1, pass1, 14707080701234567890139
+- 12345, advisor1, pass1, 14707080701234567890156
+- 20003, advisor2, pass2, 14707080701234567890300
 
 # Project Requirements
 
@@ -44,8 +44,8 @@ Each row will have the following information, separated by commas:
 - message
 
 #### Sample data:
-12345, 14707080701234567890139, Hello I need an appointment to talk about a loan
-20003, 14707080701234567890300, Please reissue my credit card ending with 0042
+- 12345, 14707080701234567890139, Hello I need an appointment to talk about a loan
+- 20003, 14707080701234567890300, Please reissue my credit card ending with 0042
 
 ## 2. Core Banking Functionalities (Implemented in C)
 - Implement core banking functionalities using the C programming language.
