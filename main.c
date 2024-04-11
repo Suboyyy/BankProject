@@ -28,19 +28,6 @@ Customer create_customer(char* RIB, int advisorID, char* username, char* passwor
     return customer;
 }
 
-Customer create_customer(char* RIB, int advisorID, char* username, char* password, char* birthdate, double netsalary, double loanpayment, double balance) {
-    Customer customer = {0};
-    strcpy(customer.RIB, RIB);
-    customer.advisorID = advisorID;
-    strcpy(customer.username, username);
-    strcpy(customer.password, password);
-    strcpy(customer.birthdate, birthdate);
-    customer.netsalary = netsalary;
-    customer.loanpayment = loanpayment;
-    customer.balance = balance;
-    return customer;
-}
-
 int LogIn(Customer* customers, char* username, char* password) {
     int i = 0;
     for (i = 0; i < 5; i++) {
