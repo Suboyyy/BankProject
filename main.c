@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int nb_lines;
+int nb_lines, user_id;
 
 typedef struct Customer
 {
@@ -34,6 +34,7 @@ int LogIn(Customer* customers, char* username, char* password) {
     for (i = 0; i < 5; i++) {
         if (strcmp(customers[i].username, username) == 0) {
             if (strcmp(customers[i].password, password) == 0) {
+                user_id = i;
                 return 1;
             }
             return 0;
@@ -54,6 +55,20 @@ void SaveFiles(Customer* customers) {
         fprintf(file, "%s, %d, %s, %s, %s, %lf, %lf, %lf\n", customers[i].RIB, customers[i].advisorID, customers[i].username, customers[i].password, customers[i].birthdate, customers[i].netsalary, customers[i].loanpayment, customers[i].balance);
     }
     fclose(file);
+    return;
+}
+
+void Withdraw(Customer* customers, double amount) {
+    if (customers[user_id].balance >= amount) {
+        customers[user_id].balance -= amount;
+        return;
+    }
+    printf("You don't have enough money\n");
+    return;
+}
+
+void Deposit(Customer* customers, double amount) {
+    customers[user_id].balance += amount;
     return;
 }
 
@@ -101,13 +116,20 @@ int main() {
     char username[20];
     char password[20];
     int reconnect = 1;
+    double amount;
     while (reconnect == 1) {
-        printf("Please enter your username and your password :\n");
+        printf("Please enter your username and your password (enter 0 0 to quit):\n");
         scanf("%s %s", &username, &password);
+        if (username[0] == '0') {
+            return 0;
+        }
         while (LogIn(customers, username, password) == 0) {
             printf("Login failed\n");
-            printf("Please enter your username and your password :\n");
+            printf("Please enter your username and your password (enter 0 0 to quit):\n");
             scanf("%s %s", &username, &password);
+            if (username[0] == '0') {
+                return 0;
+            }
         }
         printf("Login successful\n");
         int choice;
@@ -125,8 +147,16 @@ int main() {
             scanf("%d", &choice);
             switch (choice) {
                 case 1:
+                    printf("Enter the amount you want to deposit :\n"); 
+                    scanf("%lf", &amount);
+                    Deposit(customers, amount);
+                    printf("Your new balance is : %.2lf\n", customers[user_id].balance);
                     break;
                 case 2:
+                    printf("Enter the amount you want to withdraw :\n");
+                    scanf("%lf", &amount);
+                    Withdraw(customers, amount);
+                    printf("Your new balance is : %.2lf\n", customers[user_id].balance);
                     break;
                 case 3:
                     break;
