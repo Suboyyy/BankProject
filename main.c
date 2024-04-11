@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+int nb_lines;
+
 typedef struct Customer
 {
     char RIB[23];
@@ -47,11 +49,12 @@ int LogOut(Customer* customers) {
 void SaveFiles(Customer* customers) {
     FILE* file = NULL;
     file = fopen("Data/Customer.txt", "w");
-    int size = sizeof(customers) / sizeof(customers[0]);
     int i;
-    for (i = 0; i < size; i++) {
+    for (i = 0; i < nb_lines; i++) {
         fprintf(file, "%s, %d, %s, %s, %s, %lf, %lf, %lf\n", customers[i].RIB, customers[i].advisorID, customers[i].username, customers[i].password, customers[i].birthdate, customers[i].netsalary, customers[i].loanpayment, customers[i].balance);
     }
+    fclose(file);
+    return;
 }
 
 Customer* load() {
@@ -67,6 +70,7 @@ Customer* load() {
     while (fgets(buff, 200, file) != NULL) {
         lines++;
     }
+    nb_lines = lines;
     rewind(file);
     customers = (Customer*)malloc(lines *sizeof(Customer));
     if (customers == NULL) { 
