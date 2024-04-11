@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct Customer
 {
@@ -12,6 +13,19 @@ typedef struct Customer
     double loanpayment;
     double balance;
 }Customer;
+
+Customer create_customer(char* RIB, int advisorID, char* username, char* password, char* birthdate, double netsalary, double loanpayment, double balance) {
+    Customer customer = {0};
+    strcpy(customer.RIB, RIB);
+    customer.advisorID = advisorID;
+    strcpy(customer.username, username);
+    strcpy(customer.password, password);
+    strcpy(customer.birthdate, birthdate);
+    customer.netsalary = netsalary;
+    customer.loanpayment = loanpayment;
+    customer.balance = balance;
+    return customer;
+}
 
 Customer* load() {
     FILE* fichier = NULL;
@@ -32,18 +46,18 @@ Customer* load() {
         printf("Memory not allocated.\n"); 
         exit(1);
     } 
-    char RIB[23];
+    char RIB[24];
     int advisorID;
-    char username[20];
-    char password[20];
-    char birthdate[10];
+    char username[21];
+    char password[21];
+    char birthdate[11];
     double netsalary;
     double loanpayment;
     double balance;
     int i = 0;
     for (i = 0; i < lines; i++) {
-        fscanf(fichier, "%s, %d, %s, %s, %s, %lf, %lf, %lf", &RIB, &advisorID, &username, &password, &birthdate, &netsalary, &loanpayment, &balance);
-        customers[i] = (Customer){*RIB, advisorID, *username, *password, *birthdate, netsalary, loanpayment, balance};
+        fscanf(fichier, "%23[^,], %d, %20[^,], %20[^,], %10[^,], %lf, %lf, %lf\n", RIB, &advisorID, username, password, birthdate, &netsalary, &loanpayment, &balance);
+        customers[i] = create_customer(RIB, advisorID, username, password, birthdate, netsalary, loanpayment, balance);
     }
     
     fclose(fichier);
@@ -52,11 +66,5 @@ Customer* load() {
 
 int main() {
     Customer *customers = load();
-    printf("RIB: %s\n", customers[0].RIB);
-    printf("Username: %s\n", customers[0].username);
-    printf("Birthdate: %s\n", customers[0].birthdate);
-    printf("Netsalary: %lf\n", customers[0].netsalary);
-    printf("Loanpayment: %lf\n", customers[0].loanpayment);
-    printf("Balance: %lf\n", customers[0].balance);
     return 0;
 }
