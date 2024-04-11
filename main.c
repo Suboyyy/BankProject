@@ -27,6 +27,19 @@ Customer create_customer(char* RIB, int advisorID, char* username, char* passwor
     return customer;
 }
 
+int LogIn(Customer* customers, char* username, char* password) {
+    int i = 0;
+    for (i = 0; i < 5; i++) {
+        if (strcmp(customers[i].username, username) == 0) {
+            if (strcmp(customers[i].password, password) == 0) {
+                return 1;
+            }
+            return 0;
+        }
+    }
+    return 0;
+}
+
 Customer* load() {
     FILE* fichier = NULL;
     Customer* customers;
@@ -66,5 +79,15 @@ Customer* load() {
 
 int main() {
     Customer *customers = load();
+    char username[20];
+    char password[20];
+    printf("Please enter your username and you password :\n");
+    scanf("%s %s", &username, &password);
+    while (LogIn(customers, username, password) == 0) {
+        printf("Login failed\n");
+        printf("Please enter your username and you password :\n");
+        scanf("%s %s", &username, &password);
+    }
+    printf("Login successful\n");
     return 0;
 }
