@@ -101,7 +101,7 @@ int main() {
         printf("6. Send message\n");
         printf("7. Banking Advisors\n");
         printf("8. Settings\n");
-        printf("9. Exit\n");
+        printf("9. Log out\n");
         scanf("%d", &choice);
         switch (choice) {
             case 1:
