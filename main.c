@@ -40,20 +40,34 @@ int LogIn(Customer* customers, char* username, char* password) {
     return 0;
 }
 
+int LogOut(Customer* customers) {
+    return 1;
+}
+
+void SaveFiles(Customer* customers) {
+    FILE* file = NULL;
+    file = fopen("Data/Customer.txt", "w");
+    int size = sizeof(customers) / sizeof(customers[0]);
+    int i;
+    for (i = 0; i < size; i++) {
+        fprintf(file, "%s, %d, %s, %s, %s, %lf, %lf, %lf\n", customers[i].RIB, customers[i].advisorID, customers[i].username, customers[i].password, customers[i].birthdate, customers[i].netsalary, customers[i].loanpayment, customers[i].balance);
+    }
+}
+
 Customer* load() {
-    FILE* fichier = NULL;
+    FILE* file = NULL;
     Customer* customers;
     int lines = 0;
     char buff[200];
-    fichier = fopen("Data/Customer.txt", "r");
-    if (fichier == NULL) {
+    file = fopen("Data/Customer.txt", "r");
+    if (file == NULL) {
         printf("Error while opening file\n");
         exit(1);
     }
-    while (fgets(buff, 200, fichier) != NULL) {
+    while (fgets(buff, 200, file) != NULL) {
         lines++;
     }
-    rewind(fichier);
+    rewind(file);
     customers = (Customer*)malloc(lines *sizeof(Customer));
     if (customers == NULL) { 
         printf("Memory not allocated.\n"); 
@@ -69,11 +83,11 @@ Customer* load() {
     double balance;
     int i = 0;
     for (i = 0; i < lines; i++) {
-        fscanf(fichier, "%23[^,], %d, %20[^,], %20[^,], %10[^,], %lf, %lf, %lf\n", RIB, &advisorID, username, password, birthdate, &netsalary, &loanpayment, &balance);
+        fscanf(file, "%23[^,], %d, %20[^,], %20[^,], %10[^,], %lf, %lf, %lf\n", RIB, &advisorID, username, password, birthdate, &netsalary, &loanpayment, &balance);
         customers[i] = create_customer(RIB, advisorID, username, password, birthdate, netsalary, loanpayment, balance);
     }
     
-    fclose(fichier);
+    fclose(file);
     return customers;
 }
 
@@ -82,51 +96,57 @@ int main() {
     printf("Welcome to the bank\n");
     char username[20];
     char password[20];
-    printf("Please enter your username and your password :\n");
-    scanf("%s %s", &username, &password);
-    while (LogIn(customers, username, password) == 0) {
-        printf("Login failed\n");
+    int reconnect = 1;
+    while (reconnect == 1) {
         printf("Please enter your username and your password :\n");
         scanf("%s %s", &username, &password);
-    }
-    printf("Login successful\n");
-    int choice;
-    do {
-        printf("What would you like to do ?\n");
-        printf("1. Deposit\n");
-        printf("2. Withdraw\n");
-        printf("3. Check balance\n");
-        printf("4. Transfer Money\n");
-        printf("5. Loan Eligibility\n");
-        printf("6. Send message\n");
-        printf("7. Banking Advisors\n");
-        printf("8. Settings\n");
-        printf("9. Exit\n");
-        scanf("%d", &choice);
-        switch (choice) {
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
-            case 5:
-                break;
-            case 6:
-                break;
-            case 7:
-                break;
-            case 8:
-                break;
-            case 9:
-                break;
-            default:
-                printf("Invalid choice\n");
-                break;
+        while (LogIn(customers, username, password) == 0) {
+            printf("Login failed\n");
+            printf("Please enter your username and your password :\n");
+            scanf("%s %s", &username, &password);
         }
-    } while (choice != 9);
-    printf("Goodbye\n");
+        printf("Login successful\n");
+        int choice;
+        do {
+            printf("What would you like to do ?\n");
+            printf("1. Deposit\n");
+            printf("2. Withdraw\n");
+            printf("3. Check balance\n");
+            printf("4. Transfer Money\n");
+            printf("5. Loan Eligibility\n");
+            printf("6. Send message\n");
+            printf("7. Banking Advisors\n");
+            printf("8. Settings\n");
+            printf("9. Log out\n");
+            scanf("%d", &choice);
+            switch (choice) {
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    break;
+                case 6:
+                    break;
+                case 7:
+                    break;
+                case 8:
+                    break;
+                case 9:
+                    break;
+                default:
+                    printf("Invalid choice\n");
+                    break;
+            }
+        } while (choice != 9);
+        printf("Goodbye\n");
+        printf("Do you want to reconnect? (1 : yes, 0 : no)\n");
+        scanf("%d", &reconnect);
+    }  
+    SaveFiles(customers);
     return 0;
 }
