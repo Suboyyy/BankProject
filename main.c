@@ -115,9 +115,9 @@ int main() {
     printf("Welcome to the bank\n");
     char username[20];
     char password[20];
-    char reconnect = "y";
+    char reconnect = 'y';
     double amount;
-    while (reconnect == "y" || reconnect == "Y") {
+    while (reconnect == 'y' || reconnect == 'Y') {
         printf("Please enter your username and your password (enter 0 0 to quit):\n");
         scanf("%s %s", &username, &password);
         if (username[0] == '0') {
@@ -180,7 +180,7 @@ int main() {
         } while (choice != 9);
         printf("Goodbye\n");
         printf("Do you want to reconnect? (y / n)\n");
-        scanf("%c", &reconnect);
+        scanf("%s", &reconnect);
     }  
     SaveFiles(customers);
     return 0;
