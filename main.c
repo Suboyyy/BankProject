@@ -39,7 +39,7 @@ Customer create_customer(char* RIB, int advisorID, char* username, char* passwor
 
 int LogIn(Customer* customers, char* username, char* password) {
     int i = 0;
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < nb_lines; i++) {
         if (strcmp(customers[i].username, username) == 0) {
             if (strcmp(customers[i].password, password) == 0) {
                 user_id = i;
@@ -53,7 +53,7 @@ int LogIn(Customer* customers, char* username, char* password) {
 
 int findID(Customer* customers, char* RIB) {
     int i = 0;
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < nb_lines; i++) {
         if (strcmp(customers[i].RIB, RIB) == 0) {
             return i;
         }
@@ -76,13 +76,13 @@ void SaveFiles(Customer* customers) {
     return;
 }
 
-void Withdraw(Customer* customers, double amount,int id) {
+int Withdraw(Customer* customers, double amount,int id) {
     if (customers[id].balance >= amount) {
         customers[id].balance -= amount;
-        return;
+        return 1;
     }
     printf("You don't have enough money\n");
-    return;
+    return 0;
 }
 
 void Deposit(Customer* customers, double amount, int id) {
@@ -98,8 +98,10 @@ double loanEligibility(Customer* customers) {
 
 void transfer(Customer* customers, char* RIB, double amount) {
     int other_id=findID(customers, RIB);
-    Withdraw(customers, amount, user_id);
-    Deposit(customers, amount, other_id);
+    if (Withdraw(customers, amount, user_id) == 1) {
+        Deposit(customers, amount, other_id);
+        return;
+    }
     return;
 }
 
@@ -142,7 +144,7 @@ void updateInfo(Customer* customers) {
             printf("Invalid choice\n");
             break;
         }
-    printf("Do you want to update again ? (y/n) \n");
+    printf("\nDo you want to update again ? (y/n) \n");
     scanf("%c", &again);
     }
     return;
@@ -174,7 +176,7 @@ Customer* loadC() {
     }
     nb_lines = lines;
     rewind(file);
-    customers = (Customer*)malloc(lines *sizeof(Customer));
+    customers = (Customer*)malloc(nb_lines *sizeof(Customer));
     if (customers == NULL) { 
         printf("Memory not allocated.\n"); 
         exit(1);
@@ -268,7 +270,7 @@ int main() {
                     printf("Your new balance is : %.2lf\n", customers[user_id].balance);
                     break;
                 case 2:
-                    printf("_nEnter the amount you want to withdraw :\n");
+                    printf("\nEnter the amount you want to withdraw :\n");
                     scanf("%lf", &amount);
                     Withdraw(customers, amount, user_id);
                     printf("Your new balance is : %.2lf\n", customers[user_id].balance);
@@ -293,6 +295,8 @@ int main() {
                     break;
                 case 8:
                     updateInfo(customers);
+                    break;
+                case 9:
                     break;
                 default:
                     printf("Invalid choice\n");
