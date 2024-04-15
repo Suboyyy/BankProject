@@ -72,6 +72,12 @@ void Deposit(Customer* customers, double amount) {
     return;
 }
 
+double loanEligibility(Customer* customers) {
+    double max_loan = customers[user_id].netsalary * 0.33;
+    max_loan -= customers[user_id].loanpayment;
+    return (max_loan);
+}
+
 Customer* load() {
     FILE* file = NULL;
     Customer* customers;
@@ -111,7 +117,6 @@ Customer* load() {
 }
 
 int main() {
-    printf("CA MARCHE , C'EST BIEN ?\n");
     Customer *customers = load();
     printf("Welcome to the bank\n");
     char username[20];
@@ -165,6 +170,7 @@ int main() {
                 case 4:
                     break;
                 case 5:
+                    printf("You can get %.2lf as a loan\n", loanEligibility(customers));
                     break;
                 case 6:
                     break;

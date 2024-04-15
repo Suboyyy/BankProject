@@ -7,3 +7,4 @@ test.exe
 main.exe
 build/Debug/main.o
 build/Debug/outDebug.exe
+Data/datatest.txt
