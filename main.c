@@ -111,6 +111,7 @@ Customer* load() {
 }
 
 int main() {
+    printf("CA MARCHE , C'EST BIEN ?\n");
     Customer *customers = load();
     printf("Welcome to the bank\n");
     char username[20];
