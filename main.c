@@ -16,6 +16,14 @@ typedef struct Customer
     double balance;
 }Customer;
 
+typedef struct Advisor
+{
+    int advisorID;
+    char name[20];
+    char username[20];
+    char password[20];
+}Advisor;
+
 Customer create_customer(char* RIB, int advisorID, char* username, char* password, char* birthdate, double netsalary, double loanpayment, double balance) {
     Customer customer = {0};
     strcpy(customer.RIB, RIB);
@@ -151,7 +159,7 @@ void checkInfo(Customer* customers) {
     printf("Your balance is : %.2lf\n", customers[user_id].balance);
 }
 
-Customer* load() {
+Customer* loadC() {
     FILE* file = NULL;
     Customer* customers;
     int lines = 0;
@@ -171,26 +179,54 @@ Customer* load() {
         printf("Memory not allocated.\n"); 
         exit(1);
     } 
-    char RIB[24];
-    int advisorID;
-    char username[21];
-    char password[21];
-    char birthdate[11];
-    double netsalary;
-    double loanpayment;
-    double balance;
+    //char RIB[24];
+    //int advisorID;
+    //char username[21];
+    //char password[21];
+    //char birthdate[11];
+    //double netsalary;
+    //double loanpayment;
+    //double balance;
     int i = 0;
     for (i = 0; i < lines; i++) {
-        fscanf(file, "%23[^,], %d, %20[^,], %20[^,], %10[^,], %lf, %lf, %lf\n", RIB, &advisorID, username, password, birthdate, &netsalary, &loanpayment, &balance);
-        customers[i] = create_customer(RIB, advisorID, username, password, birthdate, netsalary, loanpayment, balance);
+        fscanf(file, "%23[^,], %d, %20[^,], %20[^,], %10[^,], %lf, %lf, %lf\n", customers[i].RIB, &customers[i].advisorID, customers[i].username, customers[i].password, customers[i].birthdate, &customers[i].netsalary, &customers[i].loanpayment, &customers[i].balance);
+        //customers[i] = create_customer(RIB, advisorID, username, password, birthdate, netsalary, loanpayment, balance);
     }
     
     fclose(file);
     return customers;
 }
 
+Advisor *loadA() {
+    FILE* file = NULL;
+    Advisor* advisors;
+    int lines = 0;
+    char buff[200];
+    file = fopen("Data/Advisor.txt", "r");
+    if (file == NULL) {
+        printf("Error while opening file\n");
+        exit(1);
+    }
+    while (fgets(buff, 200, file) != NULL) {
+        lines++;
+    }
+    rewind(file);
+    advisors = (Advisor*)malloc(lines *sizeof(Advisor));
+    if (advisors == NULL) { 
+        printf("Memory not allocated.\n"); 
+        exit(1);
+    } 
+    int i = 0;
+    for (i = 0; i < lines; i++) {
+        fscanf(file, "%d, %20[^,], %20[^,], %*23[^,]\n", &advisors[i].advisorID, advisors[i].username, advisors[i].password);
+    }
+    fclose(file);
+    return advisors;
+}
+
 int main() {
-    Customer *customers = load();
+    Customer *customers = loadC();
+    Advisor *advisors = loadA();
     printf("Welcome to the bank\n");
     char username[20];
     char password[20];
