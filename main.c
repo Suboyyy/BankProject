@@ -22,20 +22,8 @@ typedef struct Advisor
     char name[20];
     char username[20];
     char password[20];
+    char customer[23];
 }Advisor;
-
-Customer create_customer(char* RIB, int advisorID, char* username, char* password, char* birthdate, double netsalary, double loanpayment, double balance) {
-    Customer customer = {0};
-    strcpy(customer.RIB, RIB);
-    customer.advisorID = advisorID;
-    strcpy(customer.username, username);
-    strcpy(customer.password, password);
-    strcpy(customer.birthdate, birthdate);
-    customer.netsalary = netsalary;
-    customer.loanpayment = loanpayment;
-    customer.balance = balance;
-    return customer;
-}
 
 int LogIn(Customer* customers, char* username, char* password) {
     int i = 0;
@@ -181,18 +169,9 @@ Customer* loadC() {
         printf("Memory not allocated.\n"); 
         exit(1);
     } 
-    //char RIB[24];
-    //int advisorID;
-    //char username[21];
-    //char password[21];
-    //char birthdate[11];
-    //double netsalary;
-    //double loanpayment;
-    //double balance;
     int i = 0;
     for (i = 0; i < lines; i++) {
         fscanf(file, "%23[^,], %d, %20[^,], %20[^,], %10[^,], %lf, %lf, %lf\n", customers[i].RIB, &customers[i].advisorID, customers[i].username, customers[i].password, customers[i].birthdate, &customers[i].netsalary, &customers[i].loanpayment, &customers[i].balance);
-        //customers[i] = create_customer(RIB, advisorID, username, password, birthdate, netsalary, loanpayment, balance);
     }
     
     fclose(file);
@@ -220,7 +199,7 @@ Advisor *loadA() {
     } 
     int i = 0;
     for (i = 0; i < lines; i++) {
-        fscanf(file, "%d, %20[^,], %20[^,], %*23[^,]\n", &advisors[i].advisorID, advisors[i].username, advisors[i].password);
+        fscanf(file, "%d, %20[^,], %20[^,], %23[^,]\n", &advisors[i].advisorID, advisors[i].username, advisors[i].password, advisors[i].customer);
     }
     fclose(file);
     return advisors;
@@ -234,22 +213,46 @@ int main() {
     char password[20];
     char reconnect = 'y';
     double amount;
+    int choice;
     while (reconnect == 'y' || reconnect == 'Y') {
-        printf("Please enter your username and your password (enter 0 0 to quit):\n");
-        scanf("%s %s", &username, &password);
-        if (username[0] == '0') {
-            return 0;
-        }
-        while (LogIn(customers, username, password) == 0) {
-            printf("Login failed\n");
+        printf("\nDo you want to log in as a customer or an advisor ?\n");
+        printf("1. Customer\n");
+        printf("2. Advisor\n");
+        scanf("%d", &choice);
+        if (choice == 1) {
             printf("Please enter your username and your password (enter 0 0 to quit):\n");
             scanf("%s %s", &username, &password);
             if (username[0] == '0') {
                 return 0;
             }
+            while (LogIn(customers, username, password) == 0) {
+                printf("Login failed\n");
+                printf("Please enter your username and your password (enter 0 0 to quit):\n");
+                scanf("%s %s", &username, &password);
+                if (username[0] == '0') {
+                    return 0;
+                }
+            }
+            printf("Login successful\n");
         }
-        printf("Login successful\n");
-        int choice;
+        else if (choice == 2) {
+            printf("Please enter your username and your password (enter 0 0 to quit):\n");
+            scanf("%s %s", &username, &password);
+            if (username[0] == '0') {
+                return 0;
+            }
+            while (LogIn(advisors, username, password) == 0) {
+                printf("Login failed\n");
+                printf("Please enter your username and your password (enter 0 0 to quit):\n");
+                scanf("%s %s", &username, &password);
+                if (username[0] == '0') {
+                    return 0;
+                }
+            }
+            printf("Login successful\n");
+            printf("Which customer do you want to consult ?\n");
+            scanf("%d", &user_id);
+        }
         do {
             printf("\nWhat would you like to do ?\n");
             printf("1. Deposit\n");
