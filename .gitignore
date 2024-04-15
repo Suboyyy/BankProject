@@ -5,3 +5,5 @@ test.exe
 .vscode/launch.json
 .vscode/settings.json
 main.exe
+build/Debug/main.o
+build/Debug/outDebug.exe

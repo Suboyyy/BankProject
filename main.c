@@ -180,9 +180,9 @@ int main() {
             }
         } while (choice != 9);
         printf("Goodbye\n");
+        SaveFiles(customers);
         printf("Do you want to reconnect? (y / n)\n");
         scanf("%s", &reconnect);
     }  
-    SaveFiles(customers);
     return 0;
 }
