@@ -43,6 +43,16 @@ int LogIn(Customer* customers, char* username, char* password) {
     return 0;
 }
 
+int findID(Customer* customers, char* RIB) {
+    int i = 0;
+    for (i = 0; i < 5; i++) {
+        if (strcmp(customers[i].RIB, RIB) == 0) {
+            return i;
+        }
+    }
+    return 0;
+}
+
 int LogOut(Customer* customers) {
     return 1;
 }
@@ -58,18 +68,87 @@ void SaveFiles(Customer* customers) {
     return;
 }
 
-void Withdraw(Customer* customers, double amount) {
-    if (customers[user_id].balance >= amount) {
-        customers[user_id].balance -= amount;
+void Withdraw(Customer* customers, double amount,int id) {
+    if (customers[id].balance >= amount) {
+        customers[id].balance -= amount;
         return;
     }
     printf("You don't have enough money\n");
     return;
 }
 
-void Deposit(Customer* customers, double amount) {
-    customers[user_id].balance += amount;
+void Deposit(Customer* customers, double amount, int id) {
+    customers[id].balance += amount;
     return;
+}
+
+double loanEligibility(Customer* customers) {
+    double max_loan = customers[user_id].netsalary * 0.33;
+    max_loan -= customers[user_id].loanpayment;
+    return (max_loan);
+}
+
+void transfer(Customer* customers, char* RIB, double amount) {
+    int other_id=findID(customers, RIB);
+    Withdraw(customers, amount, user_id);
+    Deposit(customers, amount, other_id);
+    return;
+}
+
+void updateInfo(Customer* customers) {
+    char again='y';
+    while(again=='y'||again=='Y'){
+    printf("\nwhat do you want to update ?\n");
+    printf("1. Username\n");
+    printf("2. Birthdate\n");
+    printf("3. Password\n");
+    printf("4. Salary\n");
+    int choice;
+    scanf("%d", &choice);
+    switch (choice){
+        case 1:
+            char new_username[20];
+            printf("\nEnter your new username : \n");
+            scanf("%s", &new_username);
+            strcpy(customers[user_id].username, new_username);
+            break;
+        case 2:
+            char new_birthdate[10];
+            printf("\nEnter your new birthdate (dd/mm/yyyy) : \n");
+            scanf("%s", &new_birthdate);
+            strcpy(customers[user_id].birthdate, new_birthdate);   
+            break;
+        case 3:
+            char new_password[20];
+            printf("\nEnter your new password : \n");
+            scanf("%s", &new_password);
+            strcpy(customers[user_id].password, new_password);
+            break;
+        case 4:
+            double new_netsalary;
+            printf("\nEnter your new salary : \n");
+            scanf("%lf", &new_netsalary);
+            customers[user_id].netsalary = new_netsalary;
+            break;
+        default:
+            printf("Invalid choice\n");
+            break;
+        }
+    printf("Do you want to update again ? (y/n) \n");
+    scanf("%c", &again);
+    }
+    return;
+}
+
+void checkInfo(Customer* customers) {
+    printf("Your username is : %s\n", customers[user_id].username);
+    printf("Your RIB is : %s\n", customers[user_id].RIB);
+    printf("Your advisor ID is : %d\n", customers[user_id].advisorID);
+    printf("Your birthdate is : %s\n", customers[user_id].birthdate);
+    printf("Your password is : %s\n", customers[user_id].password);
+    printf("Your salary is : %.2lf\n", customers[user_id].netsalary);
+    printf("Your loan payment is : %.2lf\n", customers[user_id].loanpayment);
+    printf("Your balance is : %.2lf\n", customers[user_id].balance);
 }
 
 Customer* load() {
@@ -134,44 +213,50 @@ int main() {
         printf("Login successful\n");
         int choice;
         do {
-            printf("What would you like to do ?\n");
+            printf("\nWhat would you like to do ?\n");
             printf("1. Deposit\n");
             printf("2. Withdraw\n");
-            printf("3. Check balance\n");
-            printf("4. Transfer Money\n");
-            printf("5. Loan Eligibility\n");
-            printf("6. Send message\n");
-            printf("7. Banking Advisors\n");
-            printf("8. Settings\n");
+            printf("3. Transfer Money\n");
+            printf("4. Loan Eligibility\n");
+            printf("5. Send message\n");
+            printf("6. Banking Advisors\n");
+            printf("7. Check your informations\n");
+            printf("8. Update your informations\n");
             printf("9. Log out\n");
             scanf("%d", &choice);
             switch (choice) {
                 case 1:
-                    printf("Enter the amount you want to deposit :\n"); 
+                    printf("\nEnter the amount you want to deposit :\n"); 
                     scanf("%lf", &amount);
-                    Deposit(customers, amount);
+                    Deposit(customers, amount, user_id);
                     printf("Your new balance is : %.2lf\n", customers[user_id].balance);
                     break;
                 case 2:
-                    printf("Enter the amount you want to withdraw :\n");
+                    printf("_nEnter the amount you want to withdraw :\n");
                     scanf("%lf", &amount);
-                    Withdraw(customers, amount);
+                    Withdraw(customers, amount, user_id);
                     printf("Your new balance is : %.2lf\n", customers[user_id].balance);
                     break;
                 case 3:
-                    printf("Your balance is : %.2lf\n", customers[user_id].balance);
+                    printf("Enter the RIB of the person you want to transfer to :\n");
+                    char RIB[24];
+                    scanf("%s", &RIB);
+                    printf("Enter the amount you want to transfer :\n");
+                    scanf("%lf", &amount);
+                    transfer(customers, RIB, amount);
                     break;
                 case 4:
+                    printf("You can get %.2lf as a loan\n", loanEligibility(customers));
                     break;
                 case 5:
                     break;
                 case 6:
                     break;
                 case 7:
+                    checkInfo(customers);
                     break;
                 case 8:
-                    break;
-                case 9:
+                    updateInfo(customers);
                     break;
                 default:
                     printf("Invalid choice\n");
@@ -179,9 +264,9 @@ int main() {
             }
         } while (choice != 9);
         printf("Goodbye\n");
+        SaveFiles(customers);
         printf("Do you want to reconnect? (y / n)\n");
         scanf("%s", &reconnect);
     }  
-    SaveFiles(customers);
     return 0;
 }
