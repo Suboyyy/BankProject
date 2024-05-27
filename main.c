@@ -19,18 +19,30 @@ typedef struct Customer
 typedef struct Advisor
 {
     int advisorID;
-    char name[20];
     char username[20];
     char password[20];
-    char customer[23];
+    char RIB[50][23];
 }Advisor;
 
-int LogIn(Customer* customers, char* username, char* password) {
+int LogInC(Customer* customers, char* username, char* password) {
     int i = 0;
     for (i = 0; i < nb_lines; i++) {
         if (strcmp(customers[i].username, username) == 0) {
             if (strcmp(customers[i].password, password) == 0) {
                 user_id = i;
+                return 1;
+            }
+            return 0;
+        }
+    }
+    return 0;
+}
+
+int LogInA(Advisor* advisors, char* username, char* password) {
+    int i = 0;
+    for (i = 0; i < nb_lines; i++) {
+        if (strcmp(advisors[i].username, username) == 0) {
+            if (strcmp(advisors[i].password, password) == 0) {
                 return 1;
             }
             return 0;
@@ -192,14 +204,35 @@ Advisor *loadA() {
         lines++;
     }
     rewind(file);
-    advisors = (Advisor*)malloc(lines *sizeof(Advisor));
-    if (advisors == NULL) { 
-        printf("Memory not allocated.\n"); 
-        exit(1);
-    } 
+    int past_ID = -1;
+    int current_advisor = -1;
+    int nb_customer = 0;
     int i = 0;
     for (i = 0; i < lines; i++) {
-        fscanf(file, "%d, %20[^,], %20[^,], %23[^,]\n", &advisors[i].advisorID, advisors[i].username, advisors[i].password, advisors[i].customer);
+        current_advisor++;
+        nb_customer = 0;
+        int advisorID;
+        char username[20];
+        char password[20];
+        char RIB[23];
+        fscanf(file, "%d, %20[^,], %20[^,], %23[^,]\n", &advisorID, username, password, RIB);
+        if (advisorID != past_ID) {
+                advisors = realloc(advisors, (current_advisor+1) * sizeof(Advisor));
+            if (advisors == NULL) { 
+                printf("Memory not allocated.\n"); 
+                exit(1);
+            } 
+            advisors[current_advisor].advisorID = advisorID;
+            strcpy(advisors[current_advisor].username, username);
+            strcpy(advisors[current_advisor].password, password);
+            strcpy(advisors[current_advisor].RIB[nb_customer], RIB);
+            past_ID = advisorID;
+        }
+        else {
+            nb_customer++;
+            strcpy(advisors[current_advisor].RIB[nb_customer], RIB);
+        }
+
     }
     fclose(file);
     return advisors;
@@ -225,7 +258,7 @@ int main() {
             if (username[0] == '0') {
                 return 0;
             }
-            while (LogIn(customers, username, password) == 0) {
+            while (LogInC(customers, username, password) == 0) {
                 printf("Login failed\n");
                 printf("Please enter your username and your password (enter 0 0 to quit):\n");
                 scanf("%s %s", &username, &password);
@@ -295,7 +328,7 @@ int main() {
             if (username[0] == '0') {
                 return 0;
             }
-            while (LogIn(advisors, username, password) == 0) {
+            while (LogInA(advisors, username, password) == 0) {
                 printf("Login failed\n");
                 printf("Please enter your username and your password (enter 0 0 to quit):\n");
                 scanf("%s %s", &username, &password);
