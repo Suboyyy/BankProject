@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int nb_lines, user_id;
+int nb_lines, user_id, advisor_id;
 
 typedef struct Customer
 {
@@ -43,6 +43,7 @@ int LogInA(Advisor* advisors, char* username, char* password) {
     for (i = 0; i < nb_lines; i++) {
         if (strcmp(advisors[i].username, username) == 0) {
             if (strcmp(advisors[i].password, password) == 0) {
+                advisor_id = i;
                 return 1;
             }
             return 0;
@@ -73,6 +74,7 @@ void SaveFiles(Customer* customers) {
         fprintf(file, "%s, %d, %s, %s, %s, %lf, %lf, %lf\n", customers[i].RIB, customers[i].advisorID, customers[i].username, customers[i].password, customers[i].birthdate, customers[i].netsalary, customers[i].loanpayment, customers[i].balance);
     }
     fclose(file);
+    free(customers);
     return;
 }
 
@@ -193,6 +195,7 @@ Customer* loadC() {
 Advisor *loadA() {
     FILE* file = NULL;
     Advisor* advisors;
+    advisors = (Advisor*)malloc(0);
     int lines = 0;
     char buff[200];
     file = fopen("Data/Advisor.txt", "r");
@@ -209,7 +212,6 @@ Advisor *loadA() {
     int nb_customer = 0;
     int i = 0;
     for (i = 0; i < lines; i++) {
-        current_advisor++;
         nb_customer = 0;
         int advisorID;
         char username[20];
@@ -217,7 +219,8 @@ Advisor *loadA() {
         char RIB[23];
         fscanf(file, "%d, %20[^,], %20[^,], %23[^,]\n", &advisorID, username, password, RIB);
         if (advisorID != past_ID) {
-                advisors = realloc(advisors, (current_advisor+1) * sizeof(Advisor));
+            current_advisor++;
+            advisors = (Advisor*)realloc(advisors, (current_advisor+1) * sizeof(Advisor));
             if (advisors == NULL) { 
                 printf("Memory not allocated.\n"); 
                 exit(1);
@@ -339,9 +342,20 @@ int main() {
             printf("Login successful\n");
             char rib[24];
             do {
+                user_id = -1;
                 printf("Which customer do you want to consult ?\n");
-                scanf("%d", &rib);
-                user_id = findID(customers, rib);
+                scanf("%s", &rib);
+                int i;
+                for (i == 0; i<50; i++) {
+                    if (strcmp(rib, advisors[advisor_id].RIB[i]) == 0) {
+                        user_id = findID(customers, rib);
+                        printf("%d", user_id);
+                        break;
+                    }
+                    printf("%s\n", rib);
+                    printf("%s\n", advisors[advisor_id].RIB[i]);
+                }
+                if (user_id == -1) {printf("Wrong RIB\n");}
             } while (user_id == -1);
              do {
                 printf("\nWhat would you like to do ?\n");
