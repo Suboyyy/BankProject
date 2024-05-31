@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bank</title>
+</head>
+<body>
+    <div id="connexion">
+        <form action="/login" method="post" enctype="multipart/form-data">
+            <label for="user_type">Type de compte</label>
+            <select name="user_type">
+                <option value="customer">Customer</option>
+                <option value="advisor">Advisor</option>
+            </select>
+            <label for="pseudo">Pseudo</label>
+            <input type="text" name="pseudo" id="pseudo">
+            <label for="password">Mot de passe</label>
+            <input type="password" name="password" id="password">
+            <input type="submit" value="Se connecter">
+        </form>
+    </div>
+</body>
+</html>
