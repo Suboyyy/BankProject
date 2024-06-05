@@ -212,13 +212,13 @@ Advisor *loadA() {
     int nb_customer = 0;
     int i = 0;
     for (i = 0; i < lines; i++) {
-        nb_customer = 0;
-        int advisorID;
+        int advisorID=0;
         char username[20];
         char password[20];
         char RIB[23];
         fscanf(file, "%d, %20[^,], %20[^,], %23[^,]\n", &advisorID, username, password, RIB);
         if (advisorID != past_ID) {
+            nb_customer = 0;
             current_advisor++;
             advisors = (Advisor*)realloc(advisors, (current_advisor+1) * sizeof(Advisor));
             if (advisors == NULL) { 
@@ -235,12 +235,11 @@ Advisor *loadA() {
             nb_customer++;
             strcpy(advisors[current_advisor].RIB[nb_customer], RIB);
         }
-
     }
     fclose(file);
     return advisors;
 }
-
+/*
 int main() {
     Customer *customers = loadC();
     Advisor *advisors = loadA();
@@ -415,4 +414,24 @@ int main() {
         scanf("%s", &reconnect);
     }  
     return 0;
+}
+*/
+
+int main(){
+    printf("fndssfdbjvf");
+    Customer *customers = loadC();
+    Advisor *advisors = loadA();
+    printf("Welcome to the bank\n");
+    char username[20];
+    char password[20];
+    char reconnect = 'y';
+    double amount;
+    printf("%d", sizeof(Advisor)/sizeof(&advisors));
+    for (int i=0;i<3;i++){
+        printf("zouip");
+        printf("%d\n", advisors[i].advisorID);
+        printf("%s\n", advisors[i].RIB);
+        printf("%s\n", advisors[i].username);
+        printf("%s\n", advisors[i].password);
+    }
 }
