@@ -175,16 +175,16 @@ void updateInfo(Customer *customers)
     return;
 }
 
-void checkInfo(Customer *customers)
+void checkInfo(Customer *customers, int choice)
 {
-    printf("Your username is : %s\n", customers[user_id].username);
-    printf("Your RIB is : %s\n", customers[user_id].RIB);
-    printf("Your advisor ID is : %d\n", customers[user_id].advisorID);
-    printf("Your birthdate is : %s\n", customers[user_id].birthdate);
-    printf("Your password is : %s\n", customers[user_id].password);
-    printf("Your salary is : %.2lf\n", customers[user_id].netsalary);
-    printf("Your loan payment is : %.2lf\n", customers[user_id].loanpayment);
-    printf("Your balance is : %.2lf\n", customers[user_id].balance);
+    choice == 1 ? printf("Your username is : %s\n", customers[user_id].username) : printf("Your client username is : %s\n", customers[user_id].username);
+    choice == 1 ? printf("Your RIB is : %s\n", customers[user_id].RIB) : printf("");
+    choice == 1 ? printf("Your advisor ID is : %d\n", customers[user_id].advisorID) : printf("");
+    choice == 1 ? printf("Your birthdate is : %s\n", customers[user_id].birthdate) : printf("Client birthdate is : %s\n", customers[user_id].birthdate);
+    choice == 1 ? printf("Your password is : %s\n", customers[user_id].password) : printf("Your client password is : %s\n", customers[user_id].password);
+    choice == 1 ? printf("Your salary is : %.2lf\n", customers[user_id].netsalary) : printf("Your client salary is : %.2lf\n", customers[user_id].netsalary);
+    choice == 1 ? printf("Your loan payment is : %.2lf\n", customers[user_id].loanpayment) : printf("Your client loan payment is : %.2lf\n", customers[user_id].loanpayment);
+    choice == 1 ? printf("Your balance is : %.2lf\n", customers[user_id].balance) : printf("Your client balance is : %.2lf\n", customers[user_id].balance);
 }
 
 Customer *loadC()
@@ -293,184 +293,6 @@ Advisor *loadA()
     return advisors;
 }
 
-/*
-int main() {
-    Customer *customers = loadC();
-    Advisor *advisors = loadA();
-    printf("Welcome to the bank\n");
-    char username[20];
-    char password[20];
-    char reconnect = 'y';
-    double amount;
-    int choice;
-    while (reconnect == 'y' || reconnect == 'Y') {
-        printf("\nDo you want to log in as a customer or an advisor ?\n");
-        printf("1. Customer\n");
-        printf("2. Advisor\n");
-        scanf("%d", &choice);
-        if (choice == 1) {
-            printf("Please enter your username and your password (enter 0 0 to quit):\n");
-            scanf("%s %s", &username, &password);
-            if (username[0] == '0') {
-                return 0;
-            }
-            while (LogInC(customers, username, password) == 0) {
-                printf("Login failed\n");
-                printf("Please enter your username and your password (enter 0 0 to quit):\n");
-                scanf("%s %s", &username, &password);
-                if (username[0] == '0') {
-                    return 0;
-                }
-            }
-            printf("Login successful\n");
-            do {
-                printf("\nWhat would you like to do ?\n");
-                printf("1. Deposit\n");
-                printf("2. Withdraw\n");
-                printf("3. Transfer Money\n");
-                printf("4. Loan Eligibility\n");
-                printf("5. Send message\n");
-                printf("6. Banking Advisors\n");
-                printf("7. Check your informations\n");
-                printf("8. Update your informations\n");
-                printf("9. Log out\n");
-                scanf("%d", &choice);
-                switch (choice) {
-                    case 1:
-                        printf("\nEnter the amount you want to deposit :\n");
-                        scanf("%lf", &amount);
-                        Deposit(customers, amount, user_id);
-                        printf("Your new balance is : %.2lf\n", customers[user_id].balance);
-                        break;
-                    case 2:
-                        printf("\nEnter the amount you want to withdraw :\n");
-                        scanf("%lf", &amount);
-                        Withdraw(customers, amount, user_id);
-                        printf("Your new balance is : %.2lf\n", customers[user_id].balance);
-                        break;
-                    case 3:
-                        printf("Enter the RIB of the person you want to transfer to :\n");
-                        char RIB[24];
-                        scanf("%s", &RIB);
-                        printf("Enter the amount you want to transfer :\n");
-                        scanf("%lf", &amount);
-                        transfer(customers, RIB, amount);
-                        break;
-                    case 4:
-                        printf("You can get %.2lf as a loan\n", loanEligibility(customers));
-                        break;
-                    case 5:
-                        break;
-                    case 6:
-                        break;
-                    case 7:
-                        checkInfo(customers);
-                        break;
-                    case 8:
-                        updateInfo(customers);
-                        break;
-                    case 9:
-                        break;
-                    default:
-                        printf("Invalid choice\n");
-                        break;
-                }
-            } while (choice != 9);
-            printf("Goodbye\n");
-        }
-        else if (choice == 2) {
-            printf("Please enter your username and your password (enter 0 0 to quit):\n");
-            scanf("%s %s", &username, &password);
-            if (username[0] == '0') {
-                return 0;
-            }
-            while (LogInA(advisors, username, password) == 0) {
-                printf("Login failed\n");
-                printf("Please enter your username and your password (enter 0 0 to quit):\n");
-                scanf("%s %s", &username, &password);
-                if (username[0] == '0') {
-                    return 0;
-                }
-            }
-            printf("Login successful\n");
-            char rib[24];
-            do {
-                user_id = -1;
-                printf("Which customer do you want to consult ?\n");
-                scanf("%s", &rib);
-                int i;
-                for (i == 0; i<50; i++) {
-                    if (strcmp(rib, advisors[advisor_id].RIB[i]) == 0) {
-                        user_id = findID(customers, rib);
-                        printf("%d", user_id);
-                        break;
-                    }
-                    printf("%s\n", rib);
-                    printf("%s\n", advisors[advisor_id].RIB[i]);
-                }
-                if (user_id == -1) {printf("Wrong RIB\n");}
-            } while (user_id == -1);
-             do {
-                printf("\nWhat would you like to do ?\n");
-                printf("1. Deposit\n");
-                printf("2. Withdraw\n");
-                printf("3. Transfer Money\n");
-                printf("4. Loan Eligibility\n");
-                printf("6. Banking Advisors\n");
-                printf("7. Check customers informations\n");
-                printf("8. Update customers informations\n");
-                printf("9. Log out\n");
-                scanf("%d", &choice);
-                switch (choice) {
-                    case 1:
-                        printf("\nEnter the amount you want to deposit :\n");
-                        scanf("%lf", &amount);
-                        Deposit(customers, amount, user_id);
-                        printf("Your new balance is : %.2lf\n", customers[user_id].balance);
-                        break;
-                    case 2:
-                        printf("\nEnter the amount you want to withdraw :\n");
-                        scanf("%lf", &amount);
-                        Withdraw(customers, amount, user_id);
-                        printf("Your new balance is : %.2lf\n", customers[user_id].balance);
-                        break;
-                    case 3:
-                        printf("Enter the RIB of the person you want to transfer to :\n");
-                        char RIB[24];
-                        scanf("%s", &RIB);
-                        printf("Enter the amount you want to transfer :\n");
-                        scanf("%lf", &amount);
-                        transfer(customers, RIB, amount);
-                        break;
-                    case 4:
-                        printf("You can get %.2lf as a loan\n", loanEligibility(customers));
-                        break;
-                    case 6:
-                        break;
-                    case 7:
-                        checkInfo(customers);
-                        break;
-                    case 8:
-                        updateInfo(customers);
-                        break;
-                    case 9:
-                        break;
-                    default:
-                        printf("Invalid choice\n");
-                        break;
-                }
-            } while (choice != 9);
-            printf("Goodbye\n");
-
-        }
-        SaveFiles(customers);
-        printf("Do you want to reconnect? (y / n)\n");
-        scanf("%s", &reconnect);
-    }
-    return 0;
-}
-*/
-
 int main()
 {
     Customer *customers = loadC();
@@ -479,23 +301,139 @@ int main()
     char username[20];
     char password[20];
     char reconnect = 'y';
+    int type_of_account = 0;
     double amount;
-    for (int i = 0; i < 3; i++)
+    int choice;
+    while (reconnect == 'y' || reconnect == 'Y')
     {
-        printf("Advisor ID: %d\n", advisors[i].advisorID);
-        printf("Username: %s\n", advisors[i].username);
-        printf("Password: %s\n", advisors[i].password);
-        printf("RIB:\n");
-        for (int j = 0; j < 50; j++)
+        printf("\nDo you want to log in as a customer or an advisor ?\n");
+        printf("1. Customer\n");
+        printf("2. Advisor\n");
+        scanf("%d", &type_of_account);
+        if (type_of_account == 1)
         {
-            // Ensure we only print initialized RIBs (assuming empty ones are all zeroes)
-            if (strlen(advisors[i].RIB[j]) > 0)
+            printf("Please enter your username and your password (enter 0 0 to quit):\n");
+            scanf("%s %s", &username, &password);
+            if (username[0] == '0')
             {
-                printf("At rank %d:\n%s\n", j, advisors[i].RIB[j]);
+                return 0;
+            }
+            while (LogInC(customers, username, password) == 0)
+            {
+                printf("Login failed\n");
+                printf("Please enter your username and your password (enter 0 0 to quit):\n");
+                scanf("%s %s", &username, &password);
+                if (username[0] == '0')
+                {
+                    return 0;
+                }
             }
         }
-        printf("\n");
+        else if (type_of_account == 2)
+        {
+            printf("Please enter your username and your password (enter 0 0 to quit):\n");
+            scanf("%s %s", &username, &password);
+            if (username[0] == '0')
+            {
+                return 0;
+            }
+            while (LogInA(advisors, username, password) == 0)
+            {
+                printf("Login failed\n");
+                printf("Please enter your username and your password (enter 0 0 to quit):\n");
+                scanf("%s %s", &username, &password);
+                if (username[0] == '0')
+                {
+                    return 0;
+                }
+            }
+            char rib[24];
+            do
+            {
+                user_id = -1;
+                printf("Which customer do you want to consult ?\n");
+                scanf("%s", &rib);
+                int i;
+                for (i == 0; i < 50; i++)
+                {
+                    if (strcmp(rib, advisors[advisor_id].RIB[i]) == 0)
+                    {
+                        user_id = findID(customers, rib);
+                        printf("%d", user_id);
+                        break;
+                    }
+                    printf("%s\n", rib);
+                    printf("%s\n", advisors[advisor_id].RIB[i]);
+                }
+                if (user_id == -1)
+                {
+                    printf("Wrong RIB\n");
+                }
+            } while (user_id == -1);
+        }
+        else
+        {
+            printf("Wrong choice\n");
+        }
+        printf("Login successful\n");
+        do
+        {
+            printf("\nWhat would you like to do ?\n");
+            type_of_account == 1 ? printf("1. Deposit\n") : printf("1. Add money to client account\n");
+            type_of_account == 1 ? printf("2. Withdraw\n") : printf("2. Remove money from client account\n");
+            type_of_account == 1 ? printf("3. Transfer Money\n") : printf("3. Transfer money from client account\n");
+            type_of_account == 1 ? printf("4. Loan Eligibility\n") : printf("4. Loan eligibility of you client\n");
+            type_of_account == 1 ? printf("5. Send message\n") : printf("5.Consult message\n");
+            printf("6. Banking Advisors ?????????\n");
+            type_of_account == 1 ? printf("7. Check informations\n") : printf("7. Check informations of your client\n");
+            type_of_account == 1 ? printf("8. Update informations\n") : printf("8. Update informations of your client\n");
+            printf("9. Log out\n");
+            scanf("%d", &choice);
+            switch (choice)
+            {
+            case 1:
+                printf("\nEnter the amount you want to deposit :\n");
+                scanf("%lf", &amount);
+                Deposit(customers, amount, user_id);
+                printf("Your new balance is : %.2lf\n", customers[user_id].balance);
+                break;
+            case 2:
+                printf("\nEnter the amount you want to withdraw :\n");
+                scanf("%lf", &amount);
+                Withdraw(customers, amount, user_id);
+                printf("Your new balance is : %.2lf\n", customers[user_id].balance);
+                break;
+            case 3:
+                printf("Enter the RIB of the person you want to transfer to :\n");
+                char RIB[24];
+                scanf("%s", &RIB);
+                printf("Enter the amount you want to transfer :\n");
+                scanf("%lf", &amount);
+                transfer(customers, RIB, amount);
+                break;
+            case 4:
+                printf("You can get %.2lf as a loan\n", loanEligibility(customers));
+                break;
+            case 5:
+                break;
+            case 6:
+                break;
+            case 7:
+                checkInfo(customers, type_of_account);
+                break;
+            case 8:
+                updateInfo(customers);
+                break;
+            case 9:
+                printf("do you want to reconnect or not ? (y/n)\n");
+                scanf("%s", &reconnect);
+                break;
+            default:
+                printf("Invalid choice\n");
+                break;
+            }
+        } while (choice != 9);
+        printf("Goodbye\n");
     }
-
     return 0;
 }
