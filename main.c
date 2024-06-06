@@ -78,7 +78,7 @@ int LogOut(Customer *customers)
     return 1;
 }
 
-void SaveFiles(Customer *customers)
+void SaveFiles(Customer *customers, Advisor *advisors)
 {
     FILE *file = NULL;
     file = fopen("Data/Customer.txt", "w");
@@ -89,6 +89,72 @@ void SaveFiles(Customer *customers)
     }
     fclose(file);
     free(customers);
+    FILE *fileA = NULL;
+    fileA = fopen("Data/Advisor.txt", "w");
+    int j = 0;
+    int advisorID;
+    for (j; j < nb_lines; j++)
+    {
+        int k = 0;
+        while (advisors[j].RIB[k][0] != '\0')
+        {
+            fprintf(fileA, "%d, %s, %s, %s\n", advisors[j].advisorID, advisors[j].username, advisors[j].password, advisors[j].RIB[k]);
+            k++;
+        }
+        j = j + k;
+    }
+    fclose(fileA);
+    free(customers);
+    return;
+}
+
+void create_customer(Customer *customers, Advisor *advisors)
+{
+    nb_lines++;
+    Customer *temp_customers = realloc(customers, nb_lines * sizeof(Customer));
+    if (temp_customers == NULL)
+    {
+        // Handle memory allocation failure
+        printf("Memory allocation failed for customers.\n");
+        exit(1);
+    }
+    customers = temp_customers;
+
+    printf("Enter customer's RIB:\n");
+    scanf("%s", customers[nb_lines - 1].RIB);
+    customers[nb_lines - 1].advisorID = advisor_id;
+    printf("Enter customer's username:\n");
+    scanf("%s", customers[nb_lines - 1].username);
+    printf("Enter customer's password:\n");
+    scanf("%s", customers[nb_lines - 1].password);
+    printf("Enter customer's birthdate:\n");
+    scanf("%s", customers[nb_lines - 1].birthdate);
+    printf("Enter customer's netsalary:\n");
+    scanf("%lf", &customers[nb_lines - 1].netsalary);
+    printf("Enter customer's loanpayment:\n");
+    scanf("%lf", &customers[nb_lines - 1].loanpayment);
+    printf("Enter customer's balance:\n");
+    scanf("%lf", &customers[nb_lines - 1].balance);
+
+    Advisor *temp_advisors = realloc(advisors, nb_lines * sizeof(Advisor));
+    if (temp_advisors == NULL)
+    {
+        // Handle memory allocation failure
+        printf("Memory allocation failed for advisors.\n");
+        exit(1);
+    }
+    advisors = temp_advisors;
+
+    for (int i = 0; i < 50; i++)
+    {
+        if (advisors[advisor_id].RIB[i][0] == '\0')
+        {
+            strcpy(advisors[advisor_id].RIB[i], customers[nb_lines - 1].RIB);
+            break;
+        }
+    }
+
+    SaveFiles(customers, advisors);
     return;
 }
 
@@ -143,25 +209,25 @@ void updateInfo(Customer *customers)
         {
         case 1:
             char new_username[20];
-            printf("\nEnter your new username : \n");
+            printf("\nEnter the new username : \n");
             scanf("%s", &new_username);
             strcpy(customers[user_id].username, new_username);
             break;
         case 2:
             char new_birthdate[10];
-            printf("\nEnter your new birthdate (dd/mm/yyyy) : \n");
+            printf("\nEnter the new birthdate (dd/mm/yyyy) : \n");
             scanf("%s", &new_birthdate);
             strcpy(customers[user_id].birthdate, new_birthdate);
             break;
         case 3:
             char new_password[20];
-            printf("\nEnter your new password : \n");
+            printf("\nEnter the new password : \n");
             scanf("%s", &new_password);
             strcpy(customers[user_id].password, new_password);
             break;
         case 4:
             double new_netsalary;
-            printf("\nEnter your new salary : \n");
+            printf("\nEnter the new salary : \n");
             scanf("%lf", &new_netsalary);
             customers[user_id].netsalary = new_netsalary;
             break;
@@ -293,6 +359,34 @@ Advisor *loadA()
     return advisors;
 }
 
+void load_RIB(Customer *customers, Advisor *advisors)
+{
+    char rib[24];
+    do
+    {
+        user_id = -1;
+        printf("Which customer do you want to consult ?\n");
+        scanf("%s", &rib);
+        int i;
+        for (i == 0; i < 50; i++)
+        {
+            if (strcmp(rib, advisors[advisor_id].RIB[i]) == 0)
+            {
+                user_id = findID(customers, rib);
+                printf("%d", user_id);
+                break;
+            }
+            printf("%s\n", rib);
+            printf("%s\n", advisors[advisor_id].RIB[i]);
+        }
+        if (user_id == -1)
+        {
+            printf("Wrong RIB\n");
+        }
+    } while (user_id == -1);
+    return;
+}
+
 int main()
 {
     Customer *customers = loadC();
@@ -347,29 +441,6 @@ int main()
                     return 0;
                 }
             }
-            char rib[24];
-            do
-            {
-                user_id = -1;
-                printf("Which customer do you want to consult ?\n");
-                scanf("%s", &rib);
-                int i;
-                for (i == 0; i < 50; i++)
-                {
-                    if (strcmp(rib, advisors[advisor_id].RIB[i]) == 0)
-                    {
-                        user_id = findID(customers, rib);
-                        printf("%d", user_id);
-                        break;
-                    }
-                    printf("%s\n", rib);
-                    printf("%s\n", advisors[advisor_id].RIB[i]);
-                }
-                if (user_id == -1)
-                {
-                    printf("Wrong RIB\n");
-                }
-            } while (user_id == -1);
         }
         else
         {
@@ -384,26 +455,38 @@ int main()
             type_of_account == 1 ? printf("3. Transfer Money\n") : printf("3. Transfer money from client account\n");
             type_of_account == 1 ? printf("4. Loan Eligibility\n") : printf("4. Loan eligibility of you client\n");
             type_of_account == 1 ? printf("5. Send message\n") : printf("5.Consult message\n");
-            printf("6. Banking Advisors ?????????\n");
-            type_of_account == 1 ? printf("7. Check informations\n") : printf("7. Check informations of your client\n");
-            type_of_account == 1 ? printf("8. Update informations\n") : printf("8. Update informations of your client\n");
-            printf("9. Log out\n");
+            type_of_account == 1 ? printf("6. Check informations\n") : printf("6. Check informations of your client\n");
+            type_of_account == 1 ? printf("7. Update informations\n") : printf("7. Update informations of your client\n");
+            type_of_account == 1 ? printf("8. Log out\n") : printf("8. Create customer\n");
+            type_of_account == 1 ? printf("") : printf("9. Log out\n");
             scanf("%d", &choice);
             switch (choice)
             {
             case 1:
+                if (type_of_account == 2)
+                {
+                    load_RIB(customers, advisors);
+                }
                 printf("\nEnter the amount you want to deposit :\n");
                 scanf("%lf", &amount);
                 Deposit(customers, amount, user_id);
-                printf("Your new balance is : %.2lf\n", customers[user_id].balance);
+                type_of_account == 1 ? printf("Your balance is now: %.2lf\n", customers[user_id].balance) : printf("Your customer balance is now: %.2lf\n", customers[user_id].balance);
                 break;
             case 2:
+                if (type_of_account == 2)
+                {
+                    load_RIB(customers, advisors);
+                }
                 printf("\nEnter the amount you want to withdraw :\n");
                 scanf("%lf", &amount);
                 Withdraw(customers, amount, user_id);
-                printf("Your new balance is : %.2lf\n", customers[user_id].balance);
+                type_of_account == 1 ? printf("Your balance is now: %.2lf\n", customers[user_id].balance) : printf("Your customer balance is now: %.2lf\n", customers[user_id].balance);
                 break;
             case 3:
+                if (type_of_account == 2)
+                {
+                    load_RIB(customers, advisors);
+                }
                 printf("Enter the RIB of the person you want to transfer to :\n");
                 char RIB[24];
                 scanf("%s", &RIB);
@@ -412,17 +495,43 @@ int main()
                 transfer(customers, RIB, amount);
                 break;
             case 4:
-                printf("You can get %.2lf as a loan\n", loanEligibility(customers));
+                if (type_of_account == 2)
+                {
+                    load_RIB(customers, advisors);
+                }
+                type_of_account == 1 ? printf("You can get %.2lf as a loan\n", loanEligibility(customers)) : printf("Your client get %.2lf as a loan\n", loanEligibility(customers));
                 break;
             case 5:
+                if (type_of_account == 2)
+                {
+                    load_RIB(customers, advisors);
+                }
                 break;
             case 6:
-                break;
-            case 7:
+                if (type_of_account == 2)
+                {
+                    load_RIB(customers, advisors);
+                }
                 checkInfo(customers, type_of_account);
                 break;
-            case 8:
+            case 7:
+                if (type_of_account == 2)
+                {
+                    load_RIB(customers, advisors);
+                }
                 updateInfo(customers);
+                break;
+            case 8:
+                if (type_of_account == 1)
+                {
+                    choice = 9;
+                    printf("do you want to reconnect or not ? (y/n)\n");
+                    scanf("%s", &reconnect);
+                }
+                else
+                {
+                    create_customer(customers, advisors);
+                }
                 break;
             case 9:
                 printf("do you want to reconnect or not ? (y/n)\n");
