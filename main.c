@@ -51,7 +51,7 @@ int LogInA(Advisor *advisors, char *username, char *password)
         {
             if (strcmp(advisors[i].password, password) == 0)
             {
-                advisor_id = i;
+                advisor_id = advisors[i].advisorID;
                 return 1;
             }
             return 0;
@@ -91,23 +91,31 @@ void SaveFiles(Customer *customers, Advisor *advisors)
     free(customers);
     FILE *fileA = NULL;
     fileA = fopen("Data/Advisor.txt", "w");
-    int j = 0;
-    int advisorID;
-    for (j; j < nb_lines; j++)
+    int j;
+    int past_id = -1;
+    int rib_pos = 0;
+    int ad_pos = 0;
+    for (j = 0; j < nb_lines; j++)
     {
-        int k = 0;
-        while (advisors[j].RIB[k][0] != '\0')
+        if (advisors[ad_pos].advisorID != past_id)
         {
-            fprintf(fileA, "%d, %s, %s, %s\n", advisors[j].advisorID, advisors[j].username, advisors[j].password, advisors[j].RIB[k]);
-            k++;
+            rib_pos = 0;
+
+            past_id = advisors[ad_pos].advisorID;
+            fprintf(fileA, "%d, %s, %s, %s\n", advisors[ad_pos].advisorID, advisors[ad_pos].username, advisors[ad_pos].password, advisors[ad_pos].RIB[rib_pos]);
+            ad_pos++;
         }
-        j = j + k;
+        else
+        {
+            fprintf(fileA, "%d, %s, %s, %s\n", advisors[ad_pos].advisorID, advisors[ad_pos].username, advisors[ad_pos].password, advisors[ad_pos].RIB[rib_pos]);
+            rib_pos++;
+        }
     }
     fclose(fileA);
-    free(customers);
+    free(advisors);
     return;
 }
-
+/* fprintf(fileA, "%d, %s, %s, %s\n", advisors[j].advisorID, advisors[j].username, advisors[j].password, advisors[j].RIB[k]);*/
 void create_customer(Customer *customers, Advisor *advisors)
 {
     nb_lines++;
@@ -120,10 +128,17 @@ void create_customer(Customer *customers, Advisor *advisors)
     }
     customers = temp_customers;
 
-    printf("Enter customer's RIB:\n");
-    scanf("%s", customers[nb_lines - 1].RIB);
+    /*printf("Enter customer's RIB:\n");
+    scanf("%s", customers[nb_lines - 1].RIB);*/
+    strcpy(customers[nb_lines - 1].RIB, "98765432198765432198765");
+    strcpy(customers[nb_lines - 1].username, "test");
+    strcpy(customers[nb_lines - 1].password, "test");
+    strcpy(customers[nb_lines - 1].birthdate, "12/34/5678");
+    customers[nb_lines - 1].netsalary = 12354;
+    customers[nb_lines - 1].loanpayment = 1234;
+    customers[nb_lines - 1].balance = 1234567;
     customers[nb_lines - 1].advisorID = advisor_id;
-    printf("Enter customer's username:\n");
+    /*printf("Enter customer's username:\n");
     scanf("%s", customers[nb_lines - 1].username);
     printf("Enter customer's password:\n");
     scanf("%s", customers[nb_lines - 1].password);
@@ -135,6 +150,7 @@ void create_customer(Customer *customers, Advisor *advisors)
     scanf("%lf", &customers[nb_lines - 1].loanpayment);
     printf("Enter customer's balance:\n");
     scanf("%lf", &customers[nb_lines - 1].balance);
+    */
 
     Advisor *temp_advisors = realloc(advisors, nb_lines * sizeof(Advisor));
     if (temp_advisors == NULL)
@@ -147,7 +163,7 @@ void create_customer(Customer *customers, Advisor *advisors)
 
     for (int i = 0; i < 50; i++)
     {
-        if (advisors[advisor_id].RIB[i][0] == '\0')
+        if (advisors[advisor_id].RIB[i] == '\0')
         {
             strcpy(advisors[advisor_id].RIB[i], customers[nb_lines - 1].RIB);
             break;
@@ -392,6 +408,7 @@ int main()
     Customer *customers = loadC();
     Advisor *advisors = loadA();
     printf("Welcome to the bank\n");
+    printf(" number of lines : %d\n", nb_lines);
     char username[20];
     char password[20];
     char reconnect = 'y';
@@ -447,8 +464,22 @@ int main()
             printf("Wrong choice\n");
         }
         printf("Login successful\n");
+        int j = 0;
+        for (int i = 0; i < 3; i++)
+        {
+            printf("Advisor ID = %d\n", advisors[i].advisorID);
+            printf("Username = %s\n", advisors[i].username);
+            printf("Password = %s\n", advisors[i].password);
+            while (advisors[j].RIB[0] == '\0')
+            {
+                printf("RIB = %s\n", advisors[i].RIB);
+                j++;
+            }
+        }
+
         do
         {
+            printf("advisor ID = %d\n", advisor_id);
             printf("\nWhat would you like to do ?\n");
             type_of_account == 1 ? printf("1. Deposit\n") : printf("1. Add money to client account\n");
             type_of_account == 1 ? printf("2. Withdraw\n") : printf("2. Remove money from client account\n");
