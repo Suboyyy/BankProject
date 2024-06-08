@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int nb_lines, user_id, advisor_id;
+int nb_lines, user_id, advisor_id, advisor_index, number_advisors;
 
 typedef struct Customer
 {
@@ -45,13 +45,14 @@ int LogInC(Customer *customers, char *username, char *password)
 int LogInA(Advisor *advisors, char *username, char *password)
 {
     int i = 0;
-    for (i = 0; i < nb_lines; i++)
+    for (i = 0; i < number_advisors; i++)
     {
         if (strcmp(advisors[i].username, username) == 0)
         {
             if (strcmp(advisors[i].password, password) == 0)
             {
                 advisor_id = advisors[i].advisorID;
+                advisor_index = i;
                 return 1;
             }
             return 0;
@@ -88,31 +89,30 @@ void SaveFiles(Customer *customers, Advisor *advisors)
         fprintf(file, "%s, %d, %s, %s, %s, %lf, %lf, %lf\n", customers[i].RIB, customers[i].advisorID, customers[i].username, customers[i].password, customers[i].birthdate, customers[i].netsalary, customers[i].loanpayment, customers[i].balance);
     }
     fclose(file);
-    free(customers);
     FILE *fileA = NULL;
     fileA = fopen("Data/Advisor.txt", "w");
     int j;
-    int past_id = -1;
+    int past_id = advisors[0].advisorID;
     int rib_pos = 0;
     int ad_pos = 0;
-    for (j = 0; j < nb_lines; j++)
+    for (j = 0; j < nb_lines + 1; j++)
     {
-        if (advisors[ad_pos].advisorID != past_id)
+        if (advisors[ad_pos].RIB[rib_pos][0] == NULL)
         {
+            printf("ici\n");
             rib_pos = 0;
-
-            past_id = advisors[ad_pos].advisorID;
-            fprintf(fileA, "%d, %s, %s, %s\n", advisors[ad_pos].advisorID, advisors[ad_pos].username, advisors[ad_pos].password, advisors[ad_pos].RIB[rib_pos]);
             ad_pos++;
+            fprintf(fileA, "%d, %s, %s, %s\n", advisors[ad_pos].advisorID, advisors[ad_pos].username, advisors[ad_pos].password, advisors[ad_pos].RIB[rib_pos]);
         }
         else
         {
+            printf("la\n");
+
             fprintf(fileA, "%d, %s, %s, %s\n", advisors[ad_pos].advisorID, advisors[ad_pos].username, advisors[ad_pos].password, advisors[ad_pos].RIB[rib_pos]);
             rib_pos++;
         }
     }
     fclose(fileA);
-    free(advisors);
     return;
 }
 /* fprintf(fileA, "%d, %s, %s, %s\n", advisors[j].advisorID, advisors[j].username, advisors[j].password, advisors[j].RIB[k]);*/
@@ -120,17 +120,12 @@ void create_customer(Customer *customers, Advisor *advisors)
 {
     nb_lines++;
     Customer *temp_customers = realloc(customers, nb_lines * sizeof(Customer));
-    if (temp_customers == NULL)
-    {
-        // Handle memory allocation failure
-        printf("Memory allocation failed for customers.\n");
-        exit(1);
-    }
     customers = temp_customers;
 
     /*printf("Enter customer's RIB:\n");
     scanf("%s", customers[nb_lines - 1].RIB);*/
-    strcpy(customers[nb_lines - 1].RIB, "98765432198765432198765");
+    char rib[24] = "98765432198765432198766";
+    strcpy(customers[nb_lines - 1].RIB, rib);
     strcpy(customers[nb_lines - 1].username, "test");
     strcpy(customers[nb_lines - 1].password, "test");
     strcpy(customers[nb_lines - 1].birthdate, "12/34/5678");
@@ -153,23 +148,15 @@ void create_customer(Customer *customers, Advisor *advisors)
     */
 
     Advisor *temp_advisors = realloc(advisors, nb_lines * sizeof(Advisor));
-    if (temp_advisors == NULL)
-    {
-        // Handle memory allocation failure
-        printf("Memory allocation failed for advisors.\n");
-        exit(1);
-    }
     advisors = temp_advisors;
-
     for (int i = 0; i < 50; i++)
     {
         if (advisors[advisor_id].RIB[i] == '\0')
         {
-            strcpy(advisors[advisor_id].RIB[i], customers[nb_lines - 1].RIB);
+            strcpy(advisors[advisor_id].RIB[i], rib);
             break;
         }
     }
-
     SaveFiles(customers, advisors);
     return;
 }
@@ -345,6 +332,7 @@ Advisor *loadA()
 
         if (advisorID != past_ID)
         {
+            number_advisors++;
             nb_customer = 0;
             current_advisor++;
             advisors = (Advisor *)realloc(advisors, (current_advisor + 1) * sizeof(Advisor));
@@ -386,7 +374,7 @@ void load_RIB(Customer *customers, Advisor *advisors)
         int i;
         for (i == 0; i < 50; i++)
         {
-            if (strcmp(rib, advisors[advisor_id].RIB[i]) == 0)
+            if (strcmp(rib, advisors[advisor_index].RIB[i]) == 0)
             {
                 user_id = findID(customers, rib);
                 printf("%d", user_id);
@@ -408,7 +396,6 @@ int main()
     Customer *customers = loadC();
     Advisor *advisors = loadA();
     printf("Welcome to the bank\n");
-    printf(" number of lines : %d\n", nb_lines);
     char username[20];
     char password[20];
     char reconnect = 'y';
