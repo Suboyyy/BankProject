@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int nb_lines, user_id, advisor_id, advisor_index, number_advisors;
+int nb_lines, user_id, advisor_id, advisor_index, number_advisors, nb_messages;
 
 typedef struct Customer
 {
@@ -23,6 +23,13 @@ typedef struct Advisor
     char password[20];
     char RIB[50][24];
 } Advisor;
+
+typedef struct Message
+{
+    int advisorID;
+    char customerRIB[23];
+    char message[200];
+} Message;
 
 int LogInC(Customer *customers, char *username, char *password)
 {
@@ -99,7 +106,6 @@ void SaveFiles(Customer *customers, Advisor *advisors)
     {
         if (advisors[ad_pos].RIB[rib_pos][0] == 0)
         {
-            printf("ici\n");
             rib_pos = 0;
             ad_pos++;
             fprintf(fileA, "%d, %s, %s, %s\n", advisors[ad_pos].advisorID, advisors[ad_pos].username, advisors[ad_pos].password, advisors[ad_pos].RIB[rib_pos]);
@@ -107,8 +113,6 @@ void SaveFiles(Customer *customers, Advisor *advisors)
         }
         else
         {
-            printf("la\n");
-
             fprintf(fileA, "%d, %s, %s, %s\n", advisors[ad_pos].advisorID, advisors[ad_pos].username, advisors[ad_pos].password, advisors[ad_pos].RIB[rib_pos]);
             rib_pos++;
         }
@@ -116,8 +120,8 @@ void SaveFiles(Customer *customers, Advisor *advisors)
     fclose(fileA);
     return;
 }
-/* fprintf(fileA, "%d, %s, %s, %s\n", advisors[j].advisorID, advisors[j].username, advisors[j].password, advisors[j].RIB[k]);*/
-Customer* create_customer(Customer *customers, Advisor *advisors)
+
+Customer *create_customer(Customer *customers, Advisor *advisors)
 {
     nb_lines++;
     Customer *temp_customers = realloc(customers, nb_lines * sizeof(Customer));
@@ -140,7 +144,7 @@ Customer* create_customer(Customer *customers, Advisor *advisors)
     scanf("%lf", &customers[nb_lines - 1].loanpayment);
     printf("Enter customer's balance:\n");
     scanf("%lf", &customers[nb_lines - 1].balance);
-    
+
     for (int i = 0; i < 50; i++)
     {
         if (advisors[advisor_index].RIB[i][0] == 0)
@@ -354,6 +358,43 @@ Advisor *loadA()
     return advisors;
 }
 
+Message *loadM()
+{
+    FILE *file = NULL;
+    Message *messages;
+    int lines = 0;
+    char buff[200];
+    file = fopen("Data/Message.txt", "r");
+    if (file == NULL)
+    {
+        printf("Error while opening file\n");
+        exit(1);
+    }
+    while (fgets(buff, 200, file) != NULL)
+    {
+        lines++;
+    }
+    nb_messages = lines;
+    rewind(file);
+    messages = (Message *)malloc(nb_messages * sizeof(Message));
+    if (messages == NULL)
+    {
+        printf("Memory not allocated.\n");
+        exit(1);
+    }
+    for (int i = 0; i < nb_messages + 1; i++)
+    {
+        char RIB[23];
+        char message[200];
+        fscanf(file, "%d, %23[^,], %200[\n]", &messages[i].advisorID, &RIB, &message);
+        strcpy(messages[i].message, message);
+        strcpy(messages[i].customerRIB, RIB);
+    }
+    fclose(file);
+
+    return messages;
+}
+
 void load_RIB(Customer *customers, Advisor *advisors)
 {
     char rib[24];
@@ -386,7 +427,12 @@ int main()
 {
     Customer *customers = loadC();
     Advisor *advisors = loadA();
+    Message *messages = loadM();
     printf("Welcome to the bank\n");
+    for (int i = 0; i < nb_messages; i++)
+    {
+        printf("%d %s %s\n", messages[i].advisorID, messages[i].customerRIB, messages[i].message);
+    }
     char username[20];
     char password[20];
     char reconnect = 'y';
