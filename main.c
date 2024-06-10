@@ -95,14 +95,15 @@ void SaveFiles(Customer *customers, Advisor *advisors)
     int past_id = advisors[0].advisorID;
     int rib_pos = 0;
     int ad_pos = 0;
-    for (j = 0; j < nb_lines + 1; j++)
+    for (j = 0; j < nb_lines; j++)
     {
-        if (advisors[ad_pos].RIB[rib_pos][0] == NULL)
+        if (advisors[ad_pos].RIB[rib_pos][0] == 0)
         {
             printf("ici\n");
             rib_pos = 0;
             ad_pos++;
             fprintf(fileA, "%d, %s, %s, %s\n", advisors[ad_pos].advisorID, advisors[ad_pos].username, advisors[ad_pos].password, advisors[ad_pos].RIB[rib_pos]);
+            rib_pos++;
         }
         else
         {
@@ -116,24 +117,18 @@ void SaveFiles(Customer *customers, Advisor *advisors)
     return;
 }
 /* fprintf(fileA, "%d, %s, %s, %s\n", advisors[j].advisorID, advisors[j].username, advisors[j].password, advisors[j].RIB[k]);*/
-void create_customer(Customer *customers, Advisor *advisors)
+Customer* create_customer(Customer *customers, Advisor *advisors)
 {
     nb_lines++;
     Customer *temp_customers = realloc(customers, nb_lines * sizeof(Customer));
     customers = temp_customers;
 
-    /*printf("Enter customer's RIB:\n");
-    scanf("%s", customers[nb_lines - 1].RIB);*/
-    char rib[24] = "98765432198765432198766";
+    printf("Enter customer's RIB:\n");
+    char rib[23];
+    scanf("%s", rib);
     strcpy(customers[nb_lines - 1].RIB, rib);
-    strcpy(customers[nb_lines - 1].username, "test");
-    strcpy(customers[nb_lines - 1].password, "test");
-    strcpy(customers[nb_lines - 1].birthdate, "12/34/5678");
-    customers[nb_lines - 1].netsalary = 12354;
-    customers[nb_lines - 1].loanpayment = 1234;
-    customers[nb_lines - 1].balance = 1234567;
     customers[nb_lines - 1].advisorID = advisor_id;
-    /*printf("Enter customer's username:\n");
+    printf("Enter customer's username:\n");
     scanf("%s", customers[nb_lines - 1].username);
     printf("Enter customer's password:\n");
     scanf("%s", customers[nb_lines - 1].password);
@@ -145,20 +140,16 @@ void create_customer(Customer *customers, Advisor *advisors)
     scanf("%lf", &customers[nb_lines - 1].loanpayment);
     printf("Enter customer's balance:\n");
     scanf("%lf", &customers[nb_lines - 1].balance);
-    */
-
-    Advisor *temp_advisors = realloc(advisors, nb_lines * sizeof(Advisor));
-    advisors = temp_advisors;
+    
     for (int i = 0; i < 50; i++)
     {
-        if (advisors[advisor_id].RIB[i] == '\0')
+        if (advisors[advisor_index].RIB[i][0] == 0)
         {
-            strcpy(advisors[advisor_id].RIB[i], rib);
+            strcpy(advisors[advisor_index].RIB[i], rib);
             break;
         }
     }
-    SaveFiles(customers, advisors);
-    return;
+    return customers;
 }
 
 int Withdraw(Customer *customers, double amount, int id)
@@ -452,18 +443,6 @@ int main()
         }
         printf("Login successful\n");
         int j = 0;
-        for (int i = 0; i < 3; i++)
-        {
-            printf("Advisor ID = %d\n", advisors[i].advisorID);
-            printf("Username = %s\n", advisors[i].username);
-            printf("Password = %s\n", advisors[i].password);
-            while (advisors[j].RIB[0] == '\0')
-            {
-                printf("RIB = %s\n", advisors[i].RIB);
-                j++;
-            }
-        }
-
         do
         {
             printf("advisor ID = %d\n", advisor_id);
@@ -472,7 +451,7 @@ int main()
             type_of_account == 1 ? printf("2. Withdraw\n") : printf("2. Remove money from client account\n");
             type_of_account == 1 ? printf("3. Transfer Money\n") : printf("3. Transfer money from client account\n");
             type_of_account == 1 ? printf("4. Loan Eligibility\n") : printf("4. Loan eligibility of you client\n");
-            type_of_account == 1 ? printf("5. Send message\n") : printf("5.Consult message\n");
+            type_of_account == 1 ? printf("5. Send message\n") : printf("5. Consult message\n");
             type_of_account == 1 ? printf("6. Check informations\n") : printf("6. Check informations of your client\n");
             type_of_account == 1 ? printf("7. Update informations\n") : printf("7. Update informations of your client\n");
             type_of_account == 1 ? printf("8. Log out\n") : printf("8. Create customer\n");
@@ -548,7 +527,7 @@ int main()
                 }
                 else
                 {
-                    create_customer(customers, advisors);
+                    customers = create_customer(customers, advisors);
                 }
                 break;
             case 9:
@@ -561,6 +540,7 @@ int main()
             }
         } while (choice != 9);
         printf("Goodbye\n");
+        SaveFiles(customers, advisors);
     }
     return 0;
 }
