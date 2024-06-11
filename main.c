@@ -27,7 +27,7 @@ typedef struct Advisor
 typedef struct Message
 {
     int advisorID;
-    char customerRIB[23];
+    char customerRIB[24];
     char message[200];
 } Message;
 
@@ -86,7 +86,7 @@ int LogOut(Customer *customers)
     return 1;
 }
 
-void SaveFiles(Customer *customers, Advisor *advisors)
+void SaveFiles(Customer *customers, Advisor *advisors, Message *messages)
 {
     FILE *file = NULL;
     file = fopen("Data/Customer.txt", "w");
@@ -118,6 +118,14 @@ void SaveFiles(Customer *customers, Advisor *advisors)
         }
     }
     fclose(fileA);
+    FILE *fileM = NULL;
+    fileM = fopen("Data/Message.txt", "w");
+    int k;
+    for (k = 0; k < nb_messages; k++)
+    {
+        fprintf(fileM, "%d, %s, %s\n", messages[k].advisorID, messages[k].customerRIB, messages[k].message);
+    }
+    fclose(fileM);
     return;
 }
 
@@ -382,16 +390,14 @@ Message *loadM()
         printf("Memory not allocated.\n");
         exit(1);
     }
-    for (int i = 0; i < nb_messages + 1; i++)
+    for (int i = 0; i < nb_messages; i++)
     {
-        char RIB[23];
-        char message[200];
-        fscanf(file, "%d, %23[^,], %200[\n]", &messages[i].advisorID, &RIB, &message);
-        strcpy(messages[i].message, message);
-        strcpy(messages[i].customerRIB, RIB);
+        char rib[23];
+        fscanf(file, "%d, %23[^,], %199[^\n]", &messages[i].advisorID, rib, messages[i].message);
+        strncpy(messages[i].customerRIB, rib, sizeof(messages[i].customerRIB) - 1);
+        messages[i].customerRIB[sizeof(messages[i].customerRIB) - 1] = '\0';
     }
     fclose(file);
-
     return messages;
 }
 
@@ -423,16 +429,42 @@ void load_RIB(Customer *customers, Advisor *advisors)
     return;
 }
 
+void Consult_Messages(Message *messages)
+{
+    int have_messages = 0;
+    for (int i = 0; i < nb_messages; i++)
+    {
+        if (messages[i].advisorID == advisor_id)
+        {
+            printf("Message from %s: %s", messages[i].customerRIB, messages[i].message);
+            have_messages = 1;
+        }
+    }
+    if (have_messages == 0)
+    {
+        printf("No messages\n");
+    }
+    return;
+}
+
+void Send_Message(Message *messages, Customer *customers)
+{
+    nb_messages++;
+    Message *temp_messages = realloc(messages, nb_messages * sizeof(Message));
+    messages = temp_messages;
+    printf("Input you message (max 200 characters):\n");
+    scanf(" %199[^\n]", messages[nb_messages - 1].message);
+    messages[nb_messages - 1].advisorID = customers[user_id].advisorID;
+    strcpy(messages[nb_messages - 1].customerRIB, customers[user_id].RIB);
+    return;
+}
+
 int main()
 {
     Customer *customers = loadC();
     Advisor *advisors = loadA();
     Message *messages = loadM();
     printf("Welcome to the bank\n");
-    for (int i = 0; i < nb_messages; i++)
-    {
-        printf("%d %s %s\n", messages[i].advisorID, messages[i].customerRIB, messages[i].message);
-    }
     char username[20];
     char password[20];
     char reconnect = 'y';
@@ -491,7 +523,6 @@ int main()
         int j = 0;
         do
         {
-            printf("advisor ID = %d\n", advisor_id);
             printf("\nWhat would you like to do ?\n");
             type_of_account == 1 ? printf("1. Deposit\n") : printf("1. Add money to client account\n");
             type_of_account == 1 ? printf("2. Withdraw\n") : printf("2. Remove money from client account\n");
@@ -547,7 +578,15 @@ int main()
             case 5:
                 if (type_of_account == 2)
                 {
-                    load_RIB(customers, advisors);
+                    Consult_Messages(messages);
+                }
+                else
+                {
+                    Send_Message(messages, customers);
+                    printf("Message sent\n");
+                    printf("Message: %s\n", messages[nb_messages - 1].message);
+                    printf("RIB: %s\n", messages[nb_messages - 1].customerRIB);
+                    printf("Advisor ID: %d\n", messages[nb_messages - 1].advisorID);
                 }
                 break;
             case 6:
@@ -586,7 +625,7 @@ int main()
             }
         } while (choice != 9);
         printf("Goodbye\n");
-        SaveFiles(customers, advisors);
+        SaveFiles(customers, advisors, messages);
     }
     return 0;
 }
