@@ -447,7 +447,7 @@ void Consult_Messages(Message *messages)
     return;
 }
 
-void Send_Message(Message *messages, Customer *customers)
+Message* Send_Message(Message *messages, Customer *customers)
 {
     nb_messages++;
     Message *temp_messages = realloc(messages, nb_messages * sizeof(Message));
@@ -456,7 +456,7 @@ void Send_Message(Message *messages, Customer *customers)
     scanf(" %199[^\n]", messages[nb_messages - 1].message);
     messages[nb_messages - 1].advisorID = customers[user_id].advisorID;
     strcpy(messages[nb_messages - 1].customerRIB, customers[user_id].RIB);
-    return;
+    return messages;
 }
 
 int main()
@@ -582,7 +582,7 @@ int main()
                 }
                 else
                 {
-                    Send_Message(messages, customers);
+                    messages = Send_Message(messages, customers);
                     printf("Message sent\n");
                     printf("Message: %s\n", messages[nb_messages - 1].message);
                     printf("RIB: %s\n", messages[nb_messages - 1].customerRIB);
