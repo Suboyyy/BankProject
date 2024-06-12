@@ -436,7 +436,7 @@ void Consult_Messages(Message *messages)
     {
         if (messages[i].advisorID == advisor_id)
         {
-            printf("Message from %s: %s", messages[i].customerRIB, messages[i].message);
+            printf("\nMessage from %s: %s", messages[i].customerRIB, messages[i].message);
             have_messages = 1;
         }
     }
